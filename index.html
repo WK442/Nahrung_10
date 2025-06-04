@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Interaktives Arbeitsblatt: Die Nahrungspyramide</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css?family=Inter:400,600,700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #eaf1fe 40%, #fff6eb 100%);
+      font-family: 'Inter', Arial, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 32px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.3em;
+      font-weight: 700;
+      margin-top: 32px;
+      margin-bottom: 18px;
+      color: #2465d4;
+      text-shadow: 0 2px 10px #c9dbfc88;
+      letter-spacing: -1px;
+    }
+    section {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 18px #a7b8df33;
+      margin: 0 auto 26px auto;
+      max-width: 650px;
+      overflow: hidden;
+      border: 2.5px solid #eaf1fe;
+      padding-bottom: 10px;
+    }
+    .pyramide-img {
+      display: block;
+      margin: 24px auto 16px auto;
+      border-radius: 15px;
+      box-shadow: 0 2px 18px #c9d6ec44;
+      max-width: 98%;
+      max-height: 390px;
+      background: #eaf1fe;
+    }
+    .tasks-header {
+      margin: 18px 0 10px 0;
+      font-size: 1.26em;
+      color: #fff;
+      background: linear-gradient(90deg, #2465d4 60%, #468bf2 100%);
+      border-radius: 14px 14px 0 0;
+      padding: 12px 20px 8px 22px;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+      box-shadow: 0 2px 12px #b0c6f944;
+    }
+    label {
+      font-weight: 600;
+      color: #2465d4;
+      margin-top: 17px;
+      margin-bottom: 8px;
+      display: block;
+      font-size: 1.13em;
+    }
+    .task-number {
+      color: #468bf2;
+      font-weight: 700;
+      font-size: 1.08em;
+      margin-right: 7px;
+      letter-spacing: 0.5px;
+    }
+    textarea {
+      width: 97%;
+      font-size: 1.09em;
+      margin-bottom: 18px;
+      padding: 13px 14px;
+      border-radius: 11px;
+      border: 1.7px solid #b1c6e2;
+      background: #f5f8ff;
+      outline: none;
+      transition: border 0.15s;
+      resize: vertical;
+      min-height: 60px;
+      box-shadow: 0 1px 7px #b1c6e229;
+    }
+    textarea:focus {
+      border-color: #2465d4;
+      background: #eaf1fe;
+    }
+    button[type="button"].export {
+      margin: 0 auto;
+      display: block;
+      background: linear-gradient(90deg, #2465d4, #ffb566);
+      color: #fff;
+      border: none;
+      border-radius: 24px;
+      font-size: 1.17em;
+      font-weight: 600;
+      padding: 16px 38px;
+      box-shadow: 0 3px 12px #d4d9e933;
+      margin-top: 34px;
+      letter-spacing: 0.5px;
+      transition: background 0.22s, transform 0.14s;
+      cursor: pointer;
+    }
+    button[type="button"].export:hover {
+      background: linear-gradient(90deg, #184072, #fca44b);
+      transform: scale(1.035);
+    }
+    @media (max-width: 700px) {
+      section { max-width: 99vw; }
+      .pyramide-img { max-width: 99vw; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Die Nahrungspyramide</h1>
+  <section>
+    <img src="Die-Nahrungspyramide.jpg" alt="Nahrungspyramide" class="pyramide-img">
+    <div class="tasks-header">Aufgaben</div>
+    <form id="worksheet" autocomplete="off">
+      <label for="frage1">
+        <span class="task-number">1.</span>Was zeigt die Nahrungspyramide?
+      </label>
+      <textarea id="frage1" rows="3" placeholder="Deine Antwort..."></textarea>
+      <label for="frage2">
+        <span class="task-number">2.</span>Welche Regel gilt für die Spitze der Pyramide?
+      </label>
+      <textarea id="frage2" rows="3" placeholder="Deine Antwort..."></textarea>
+      <button type="button" class="export" onclick="saveAsPDF()">Ergebnisse als PDF speichern</button>
+    </form>
+  </section>
+
+  <!-- html2canvas & jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    async function saveAsPDF() {
+      const frage1 = document.getElementById('frage1').value;
+      const frage2 = document.getElementById('frage2').value;
+      const img = document.querySelector('.pyramide-img');
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+      let y = 15;
+      pdf.setFontSize(21); pdf.setTextColor(34,101,212); pdf.text('Die Nahrungspyramide', 17, y); y+=9;
+      // Bild in PDF einfügen
+      // Lade Bild als DataURL (async)
+      function loadImageToDataURL(img) {
+        return new Promise(resolve => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          resolve(canvas.toDataURL('image/jpeg'));
+        });
+      }
+      const imgData = await loadImageToDataURL(img);
+      pdf.addImage(imgData, 'JPEG', 18, y, 175, 75); // Bildgröße ggf. anpassen
+      y += 82;
+
+      pdf.setFontSize(14); pdf.setTextColor(0,0,0);
+      pdf.text('Aufgaben', 17, y); y += 7;
+
+      pdf.setFont('helvetica','normal');
+      pdf.setFontSize(12);
+      pdf.text('1. Was zeigt die Nahrungspyramide?', 17, y); y += 6;
+      // Text mit Umbruch
+      function addMultiline(text, x, y, maxWidth = 175, lineHeight = 7) {
+        if (!text) text = "-";
+        const lines = pdf.splitTextToSize(text, maxWidth);
+        lines.forEach(line => {
+          pdf.text(line, x, y);
+          y += lineHeight;
+        });
+        return y;
+      }
+      y = addMultiline(frage1, 19, y, 175, 7) + 5;
+      pdf.text('2. Welche Regel gilt für die Spitze der Pyramide?', 17, y); y += 6;
+      y = addMultiline(frage2, 19, y, 175, 7) + 4;
+
+      pdf.save('Nahrungspyramide-Arbeitsblatt.pdf');
+    }
+  </script>
+</body>
+</html>
